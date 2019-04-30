@@ -110,11 +110,11 @@ $result = $client->run('MATCH (n:Person) RETURN n');
 // a result always contains a collection (array) of Record objects
 
 // get all records
-$records = $result->getRecords();
+$records = $result->records();
 
 // get the first or (if expected only one) the only record
 
-$record = $result->getRecord();
+$record = $result->firstRecord();
 ```
 
 A `Record` object contains the values of one record from your Cypher query :
@@ -123,7 +123,7 @@ A `Record` object contains the values of one record from your Cypher query :
 $query = 'MATCH (n:Person)-[:FOLLOWS]->(friend) RETURN n.name, collect(friend) as friends';
 $result = $client->run($query);
 
-foreach ($result->getRecords() as $record) {
+foreach ($result->records() as $record) {
     echo sprintf('Person name is : %s and has %d number of friends', $record->value('name'), count($record->value('friends')));
 }
 ```
@@ -158,7 +158,7 @@ $stack->push('MATCH (n:Person {uuid: {uuid1} }), (n2:Person {uuid: {uuid2} }) ME
 $results = $client->runStack($stack);
 
 $followResult = $results->get('user_follows');
-$followRelationshipId = $followResult->getRecord()->value('relId');
+$followRelationshipId = $followResult->firstRecord()->get('relId');
 ```
 
 ### Working with Result sets
@@ -368,7 +368,7 @@ Sometimes you want to get an immediate result of a statement inside the transact
 ```php
 $result = $tx->run('CREATE (n:Person) SET n.name = {name} RETURN id(n)', ['name' => 'Michal']);
 
-echo $result->getRecord()->value("id(n)");
+echo $result->firstRecord()->get("id(n)");
 ```
 
 If the transaction has not yet begun, the BEGIN of the transaction will be done automatically.
